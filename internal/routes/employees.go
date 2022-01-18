@@ -13,13 +13,10 @@ func RegisterEmployeeRoutes(app *fiber.App) {
 
 func GetAllEmployees(c *fiber.Ctx) error {
 
-	c.SendString("some value")
-
-	return nil
+	return c.SendString("some value")
 }
 
 func GetEmployee(c *fiber.Ctx) error {
-	c.SendString(fmt.Sprintf("requested employee with id: %v ", c.Params("id")))
 
-	return nil
+	return c.SendString(fmt.Sprintf("requested employee with id: %v ", c.Params("id")))
 }
