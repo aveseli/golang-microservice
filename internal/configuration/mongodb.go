@@ -9,14 +9,14 @@ import (
 )
 
 const dbName = "mydb"
-const mongoUri = "mongodb://root:example@localhost:27017/" + dbName
+const mongoUri = "mongodb://root:example@localhost:27017/"
 
 type MongoInstance struct {
 	Client *mongo.Client
 	Db     *mongo.Database
 }
 
-var mg MongoInstance
+var Mongo MongoInstance
 
 func Connect() error {
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoUri))
@@ -29,13 +29,12 @@ func Connect() error {
 	defer cancel()
 
 	err = client.Connect(ctx)
-	db := client.Database(dbName)
-
 	if err != nil {
 		return err
 	}
+	db := client.Database(dbName)
 
-	mg = MongoInstance{
+	Mongo = MongoInstance{
 		Client: client,
 		Db:     db,
 	}
