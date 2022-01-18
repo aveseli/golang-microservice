@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aveseli/golang-microservice/configuration"
-	"github.com/aveseli/golang-microservice/routes"
+	"github.com/aveseli/golang-microservice/internal/configuration"
+	"github.com/aveseli/golang-microservice/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
 )
