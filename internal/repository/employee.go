@@ -12,10 +12,10 @@ import (
 
 // Employee struct
 type Employee struct {
-	ID     string  `json:"id,omitempty" bson:"_id,omitempty"`
-	Name   string  `json:"name"`
-	Salary float64 `json:"salary"`
-	Age    float64 `json:"age"`
+	ID     primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Name   string             `json:"name"`
+	Salary float64            `json:"salary"`
+	Age    float64            `json:"age"`
 }
 
 func db() (*mongo.Collection, context.Context, context.CancelFunc) {
@@ -27,7 +27,8 @@ func db() (*mongo.Collection, context.Context, context.CancelFunc) {
 func GetEmployee(id string) (Employee, error) {
 	c, ctx, cancel := db()
 	defer cancel()
-	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: id}})
+	objectID, _ := primitive.ObjectIDFromHex(id)
+	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: objectID}})
 	e := Employee{}
 	err := r.Decode(&e)
 	return e, err
