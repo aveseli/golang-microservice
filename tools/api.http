@@ -4,6 +4,9 @@ GET http://localhost:3000/employees
 ### Get specific
 GET http://localhost:3000/employees/61f1bdb9aa60bc380be73cdc
 
+### Delete specific
+DELETE  http://localhost:3000/employees/61f1bdb9aa60bc380be73cdc
+
 ### Post one
 POST http://localhost:3000/employees
 Content-Type: application/json

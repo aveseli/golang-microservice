@@ -25,10 +25,20 @@ func db() (*mongo.Collection, context.Context, context.CancelFunc) {
 }
 
 func GetEmployee(id string) (Employee, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return Employee{}, err
+	}
+
+	return getEmployeeByObjectId(objectID)
+}
+
+func getEmployeeByObjectId(id primitive.ObjectID) (Employee, error) {
 	c, ctx, cancel := db()
 	defer cancel()
-	objectID, _ := primitive.ObjectIDFromHex(id)
-	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: objectID}})
+
+	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: id}})
 	e := Employee{}
 	err := r.Decode(&e)
 	return e, err
@@ -67,9 +77,23 @@ func GetAllEmployees() ([]Employee, error) {
 	return employees, nil
 }
 
-func InsertEmployee(e Employee) {
+func InsertEmployee(e Employee) (er Employee, err error) {
 	c, ctx, cancel := db()
 	defer cancel()
 
-	c.InsertOne(ctx, e)
+	r, err := c.InsertOne(ctx, e)
+	if err != nil {
+		return Employee{}, err
+	}
+
+	return getEmployeeByObjectId(r.InsertedID.(primitive.ObjectID))
+}
+
+func DeleteEmployee(id string) (count int64, err error) {
+	c, ctx, cancel := db()
+	defer cancel()
+
+	objectID, _ := primitive.ObjectIDFromHex(id)
+	r, err := c.DeleteOne(ctx, bson.M{"_id": objectID})
+	return r.DeletedCount, err
 }

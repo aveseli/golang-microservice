@@ -11,6 +11,7 @@ import (
 func RegisterEmployeeRoutes(app *fiber.App) {
 	app.Get("/employees", GetAllEmployees)
 	app.Get("/employees/:id", GetEmployee)
+	app.Delete("/employees/:id", DeleteEmployee)
 	app.Post("/employees", PostEmployee)
 }
 
@@ -38,13 +39,33 @@ func GetEmployee(c *fiber.Ctx) error {
 	return c.JSON(e)
 }
 
+func DeleteEmployee(c *fiber.Ctx) error {
+	count, err := repository.DeleteEmployee(c.Params("id"))
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return c.SendStatus(fiber.StatusNotFound)
+		}
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if count == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	return c.JSON(count)
+}
+
 func PostEmployee(c *fiber.Ctx) error {
 	e := new(repository.Employee)
 	if err := c.BodyParser(e); err != nil {
 		return err
 	}
 
-	repository.InsertEmployee(*e)
+	r, err := repository.InsertEmployee(*e)
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
 
-	return nil
+	}
+
+	return c.JSON(r)
 }
