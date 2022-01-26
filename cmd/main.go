@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aveseli/golang-microservice/internal/configuration"
+	"github.com/aveseli/golang-microservice/internal/cfg"
 	"github.com/aveseli/golang-microservice/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,11 +12,16 @@ import (
 
 func main() {
 
-	err := configuration.Connect()
+	err := cfg.Connect()
 	if err != nil {
 		fmt.Print("Could not connect to mongodb. Error: ", err)
 		os.Exit(1)
 	}
+	defer func() {
+		if err := cfg.Disconnect(); err != nil {
+			panic(err)
+		}
+	}()
 
 	app := fiber.New()
 

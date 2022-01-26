@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/aveseli/golang-microservice/internal/configuration"
+	"github.com/aveseli/golang-microservice/internal/cfg"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,17 +18,16 @@ type Employee struct {
 	Age    float64 `json:"age"`
 }
 
-func dbAccess() (*mongo.Collection, context.Context, context.CancelFunc) {
-	c := configuration.Mongo.Db.Collection("employee")
+func db() (*mongo.Collection, context.Context, context.CancelFunc) {
+	c := cfg.MongoDb.Db.Collection("employee")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-
 	return c, ctx, cancel
 }
 
 func GetEmployee(id string) (Employee, error) {
-	c, ctx, cancel := dbAccess()
-	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: id}})
+	c, ctx, cancel := db()
 	defer cancel()
+	r := c.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: id}})
 	e := Employee{}
 	err := r.Decode(&e)
 	return e, err
@@ -36,7 +35,7 @@ func GetEmployee(id string) (Employee, error) {
 
 func GetAllEmployees() ([]Employee, error) {
 	var employees []Employee
-	c, ctx, cancel := dbAccess()
+	c, ctx, cancel := db()
 
 	defer cancel()
 
@@ -68,7 +67,7 @@ func GetAllEmployees() ([]Employee, error) {
 }
 
 func InsertEmployee(e Employee) {
-	c, ctx, cancel := dbAccess()
+	c, ctx, cancel := db()
 	defer cancel()
 
 	c.InsertOne(ctx, e)

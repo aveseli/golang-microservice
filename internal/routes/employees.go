@@ -23,7 +23,6 @@ func GetAllEmployees(c *fiber.Ctx) error {
 		fmt.Println(fmt.Errorf("GetAllEmployees: Error %v", err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-
 	return c.JSON(e)
 }
 

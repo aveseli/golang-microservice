@@ -1,4 +1,4 @@
-package configuration
+package cfg
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type MongoInstance struct {
 	Db     *mongo.Database
 }
 
-var Mongo MongoInstance
+var MongoDb MongoInstance
 
 func Connect() error {
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoUri))
@@ -25,7 +25,6 @@ func Connect() error {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-
 	defer cancel()
 
 	err = client.Connect(ctx)
@@ -34,10 +33,14 @@ func Connect() error {
 	}
 	db := client.Database(dbName)
 
-	Mongo = MongoInstance{
+	MongoDb = MongoInstance{
 		Client: client,
 		Db:     db,
 	}
 
 	return nil
+}
+
+func Disconnect() error {
+	return MongoDb.Client.Disconnect(context.Background())
 }
